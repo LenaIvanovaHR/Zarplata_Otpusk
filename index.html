@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Отпуск, аванс и зарплата — тренажёр • ГК «Теплолюкс»</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1c1e21; --ink2:#26292d; --ink3:#33373c;
+  --grey:#d6d6d2; --grey2:#9a9c9e;
+  --beige:#ece3d3; --beige2:#f6f1e7;
+  --terra:#d95d39; --terra2:#b8472a;
+  --ok:#5f8f6b; --bad:#c2453a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;background:var(--ink);color:var(--beige);-webkit-font-smoothing:antialiased;line-height:1.5}
+.app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
+
+/* Sidebar */
+aside{background:var(--ink2);border-right:1px solid var(--ink3);padding:28px 24px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{background:var(--terra);color:#fff;font-weight:800;font-size:13px;letter-spacing:.14em;padding:8px 12px;border-radius:6px}
+.brand small{color:var(--grey2);font-size:12px;line-height:1.3}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--ink);border:1px solid var(--ink3);border-radius:12px;padding:12px 14px}
+.stat.wide{grid-column:span 2}
+.stat span{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey2)}
+.stat b{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat.wide b{color:var(--terra);font-size:20px}
+.chapters{display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--grey2);text-transform:uppercase;letter-spacing:.08em}
+.chapters b{color:var(--terra)}
+.steps{list-style:none;display:flex;flex-direction:column;gap:2px;overflow:auto;flex:1}
+.steps .grp{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey2);padding:12px 10px 4px}
+.steps .grp:first-child{padding-top:0}
+.steps li{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--grey2);transition:.2s}
+.steps li i{font-style:normal;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--ink3);display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.steps li.cur{background:var(--ink);color:var(--beige)}
+.steps li.cur i{border-color:var(--terra);color:var(--terra)}
+.steps li.ok i{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps li.bad i{background:var(--bad);border-color:var(--bad);color:#fff}
+.steps li.ok,.steps li.bad{color:var(--grey)}
+
+/* Main */
+main{padding:clamp(20px,4vw,56px);display:flex;flex-direction:column;justify-content:center;max-width:920px;width:100%;margin:0 auto}
+.bar{height:3px;background:var(--ink3);border-radius:3px;overflow:hidden;margin-bottom:32px}
+.bar div{height:100%;background:var(--terra);width:0;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.kicker{display:flex;gap:10px;align-items:center;color:var(--terra);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+.kicker em{font-style:normal;color:var(--grey2);font-weight:500;letter-spacing:.04em;text-transform:none}
+h1{font-size:clamp(26px,3.4vw,40px);line-height:1.15;font-weight:800;letter-spacing:-.02em;margin-bottom:22px}
+.theory{background:var(--beige);color:var(--ink);border-radius:16px;padding:20px 24px;margin-bottom:22px;position:relative}
+.theory::before{content:"ТЕОРИЯ";position:absolute;top:-9px;left:20px;background:var(--terra);color:#fff;font-size:10px;font-weight:700;letter-spacing:.14em;padding:3px 10px;border-radius:4px}
+.theory ul{list-style:none;display:grid;gap:8px;margin-top:4px}
+.theory li{font-size:14.5px;padding-left:18px;position:relative}
+.theory li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;background:var(--terra);border-radius:2px}
+.q{font-size:clamp(17px,2vw,20px);font-weight:600;margin-bottom:16px;color:#fff}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;background:var(--ink2);border:1.5px solid var(--ink3);color:var(--beige);border-radius:14px;padding:15px 18px;font:inherit;font-size:15px;cursor:pointer;transition:.18s}
+.opt kbd{font:inherit;font-size:12px;font-weight:700;color:var(--grey2);border:1.5px solid var(--ink3);border-radius:7px;width:28px;height:28px;display:grid;place-items:center;flex:none;transition:.18s}
+.opt:hover:not(:disabled){border-color:var(--terra);transform:translateX(4px)}
+.opt:hover:not(:disabled) kbd{border-color:var(--terra);color:var(--terra)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:rgba(95,143,107,.14)}
+.opt.right kbd{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--bad);background:rgba(194,69,58,.14)}
+.opt.wrong kbd{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dim{opacity:.4}
+
+.debrief{margin-top:20px;border:1.5px solid var(--ink3);border-radius:16px;overflow:hidden;animation:up .35s ease}
+.debrief .head{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.debrief.ok .head{background:var(--ok);color:#fff}
+.debrief.bad .head{background:var(--bad);color:#fff}
+.debrief .body{padding:18px 20px;display:grid;gap:12px;background:var(--ink2)}
+.debrief p{font-size:14.5px;color:var(--grey)}
+.calc{font-variant-numeric:tabular-nums;background:var(--ink);border-left:3px solid var(--terra);padding:11px 14px;border-radius:0 10px 10px 0;font-size:14px;color:var(--beige)}
+.src{font-size:12px;color:var(--grey2)}
+.foot{display:flex;justify-content:flex-end;align-items:center;gap:14px;flex-wrap:wrap;margin-top:4px}
+.btn{background:var(--terra);color:#fff;border:0;border-radius:12px;padding:13px 26px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:.18s}
+.btn:hover{background:var(--terra2);transform:translateY(-1px)}
+.btn.ghost{background:transparent;border:1.5px solid var(--ink3);color:var(--beige)}
+.btn.ghost:hover{border-color:var(--terra);background:transparent}
+.note{margin-top:28px;font-size:11.5px;color:var(--grey2)}
+
+/* Intro / Final */
+.lead{font-size:17px;color:var(--grey);max-width:620px;margin-bottom:26px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+.grid3 div{background:var(--ink2);border:1px solid var(--ink3);border-radius:14px;padding:16px}
+.grid3 b{display:block;font-size:24px;color:var(--terra)}
+.grid3 span{font-size:12.5px;color:var(--grey2)}
+.recap{display:grid;gap:6px;margin:18px 0 26px}
+.recap div{display:flex;justify-content:space-between;gap:12px;background:var(--ink2);border-radius:10px;padding:10px 14px;font-size:13.5px}
+.recap .y{border-left:3px solid var(--ok)}.recap .n{border-left:3px solid var(--bad)}
+.big{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--terra)}
+.fade{animation:up .4s ease}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:16px 20px;gap:14px}
+  .steps,.chapters{display:none}
+  .stats{grid-template-columns:repeat(3,1fr);flex:1;min-width:260px}
+  .stat.wide{grid-column:auto}.stat b,.stat.wide b{font-size:15px}
+  .grid3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><div class="logo">ТЕПЛОЛЮКС</div><small>Корпоративное обучение<br>Отпуск, аванс, зарплата</small></div>
+    <div class="stats">
+      <div class="stat wide"><span>Верно</span><b id="sOk">0/17</b></div>
+      <div class="stat"><span>Серия</span><b id="sStreak">0</b></div>
+      <div class="stat"><span>Лучшая</span><b id="sBest">0</b></div>
+    </div>
+    <ol class="steps" id="steps"></ol>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script>
+/* ============ КОНТЕНТ ============ */
+const CASES = [
+ {ch:"Отпуск", tag:"Основы",
+  theory:["График отпусков обязателен и для работодателя, и для работника.","Утверждается не позднее чем за две недели до начала календарного года."],
+  q:"Кто обязан соблюдать график отпусков — сотрудник, работодатель или оба?",
+  opts:["Только сотрудник","Только работодатель","Обе стороны"], ok:2,
+  calc:"ст. 123 ТК РФ",
+  why:"График — не пожелание, а обязательный документ для обеих сторон трудовых отношений."},
+
+ {ch:"Отпуск", tag:"КЭДО",
+  theory:["Уведомление об отпуске в КЭДО — это информирование, а не запрос согласия.","Подпись означает «ознакомлен», а не «согласен с датами»."],
+  q:"Вам пришло уведомление об отпуске в КЭДО, а даты не устраивают. Что делать?",
+  opts:["Не подписывать, пока не согласуют другие даты","Подписать уведомление и написать заявление о переносе, оставив комментарий к уведомлению в КЭДО","Просто не выйти в отпуск и продолжать работать"], ok:1,
+  calc:"Правило компании (КЭДО) · ст. 123 ТК РФ",
+  why:"Уведомление подписывают всегда. Запрос переноса — отдельное действие: заявление и комментарий в КЭДО."},
+
+ {ch:"Отпуск", tag:"КЭДО",
+  theory:["Перенос по инициативе сотрудника возможен только по согласованию с работодателем.","График утверждён с учётом рабочих процессов, поэтому перенос подтверждают не всегда."],
+  q:"Вы запросили перенос отпуска, но согласования нет или пришёл отказ. Что делать?",
+  opts:["Считать, что раз не запретили прямо — отпуск перенесён","Уйти в отпуск в даты, указанные в уведомлении","Взять больничный на эти даты"], ok:1,
+  calc:"Правило компании · ст. 123, 124 ТК РФ",
+  why:"Пока перенос не подтверждён, действуют даты графика. Просьбу о переносе стоит подавать заранее."},
+
+ {ch:"Отпуск", tag:"Сроки",
+  theory:["Право на первый отпуск возникает после 6 месяцев непрерывной работы.","По соглашению сторон отпуск можно предоставить и раньше."],
+  q:"Через сколько месяцев работы у сотрудника по умолчанию возникает право на первый отпуск?",
+  opts:["3 месяца","6 месяцев","12 месяцев"], ok:1,
+  calc:"ст. 122 ТК РФ",
+  why:"Стандартный срок — 6 месяцев, но стороны вправе договориться об отпуске раньше."},
+
+ {ch:"Отпуск", tag:"Части отпуска",
+  theory:["Отпуск можно разделить на части по соглашению с работодателем.","Хотя бы одна из частей должна быть не менее 14 календарных дней."],
+  q:"Сотрудник хочет разбить отпуск на части по 7 дней, всего 4 раза. Допустимо ли это без изменений?",
+  opts:["Да, дробить можно как угодно","Нет — хотя бы одна часть должна быть не менее 14 дней","Нет, отпуск нельзя делить вообще"], ok:1,
+  calc:"ст. 125 ТК РФ",
+  why:"Закон не запрещает дробление, но требует, чтобы минимум одна часть была не короче 14 календарных дней."},
+
+ {ch:"Отпуск", tag:"Праздники",
+  theory:["Нерабочие праздничные дни не входят в число календарных дней отпуска.","Отпуск на эти дни продлевается, но сами праздничные дни не оплачиваются как дни отпуска (это отдельные нерабочие дни)."],
+  q:"Отпуск попал на 9 мая. Что произойдёт с этим днём?",
+  opts:["День войдёт в отпуск и будет оплачен как день отпуска","Отпуск продлится на этот день, он не считается днём отпуска","Отпуск сократится на этот день"], ok:1,
+  calc:"ст. 120 ТК РФ · пример: 8 марта, 9 мая",
+  why:"Праздничные дни исключаются из подсчёта дней отпуска, поэтому отпуск фактически продлевается."},
+
+ {ch:"Отпуск", tag:"Без содержания",
+  theory:["Отпуск за свой счёт оформляется по письменному заявлению и с согласия работодателя.","В части случаев (рождение ребёнка, регистрация брака, смерть близкого родственника) работодатель обязан предоставить до 5 календарных дней."],
+  q:"У сотрудника умер близкий родственник, нужно 3 дня без содержания. Может ли работодатель отказать?",
+  opts:["Да, это право работодателя в любом случае","Нет — по этим основаниям работодатель обязан предоставить до 5 дней","Нет, но только если стаж больше 5 лет"], ok:1,
+  calc:"ст. 128 ТК РФ",
+  why:"Для перечисленных в законе случаев отпуск без содержания — обязанность работодателя, а не право отказать."},
+
+ {ch:"Отпускные", tag:"Сроки выплаты",
+  theory:["В компании отпускные выплачивают не позднее чем за 4 календарных дня до начала отпуска.","Если оплата не пришла — нужно обратиться в отдел персонала."],
+  q:"Отпуск начинается в понедельник. Когда должны прийти отпускные?",
+  opts:["Не позднее четверга той же недели","В пятницу вечером","В сам день начала отпуска"], ok:0,
+  calc:"Правило компании · ст. 136, 124 ТК РФ",
+  why:"Срок отсчитывается от даты начала отпуска — 4 календарных дня до понедельника заканчиваются в четверг."},
+
+ {ch:"Отпускные", tag:"Расчёт",
+  theory:["Отпускные = средний дневной заработок × число календарных дней отпуска.","Средний дневной заработок = заработок за 12 месяцев ÷ 12 ÷ 29,3."],
+  q:"Заработок за 12 месяцев — 1 200 000 ₽, отпуск — 14 дней. Сколько примерно придёт на руки после НДФЛ?",
+  opts:["≈ 47 780 ₽", "≈ 41 570 ₽", "≈ 35 000 ₽"], ok:1,
+  calc:"1 200 000 ÷ 12 ÷ 29,3 ≈ 3 412,97 ₽/день × 14 ≈ 47 781,58 ₽ до налога → минус НДФЛ 13% ≈ 41 570 ₽",
+  why:"29,3 — среднемесячное число календарных дней. Не забывайте про НДФЛ при прикидке суммы на руки."},
+
+ {ch:"Отпускные", tag:"Как не терять в деньгах",
+  theory:["Отпускные считаются по календарным дням, зарплата — по средней за 12 месяцев, а не по окладу.","Чтобы не терять в деньгах, есть практический приём: захватывать выходные."],
+  q:"Вы работаете в пятидневку. Как взять отпуск так, чтобы отдохнуть 7 календарных дней, но заплатить отпускными меньше дней?",
+  opts:["Взять ровно 5 рабочих дней подряд", "Взять 7 дней подряд, захватив субботу и воскресенье", "Это не имеет значения, отпускные не зависят от выходных"], ok:1,
+  calc:"7 календарных дней отпуска = 5 рабочих + суббота + воскресенье внутри периода",
+  why:"Отпуск считается в календарных днях, поэтому выходные внутри периода «покрываются» отпуском без доп. расхода рабочих дней."},
+
+ {ch:"Отпускные", tag:"Выплата вперёд",
+  theory:["Отпускные платят до начала отпуска, то есть до того, как отпуск фактически «отработан».","Это стоит учитывать при планировании личных финансов."],
+  q:"Отпуск попал на первую половину месяца. Как это отразится на ближайшем авансе и зарплате?",
+  opts:["Никак не отразится, аванс и зарплата придут как обычно","Аванс и зарплата будут выплачены за вычетом дней, за которые уже получены отпускные","Отпускные придётся вернуть при получении зарплаты"], ok:1,
+  calc:"ст. 137 ТК РФ",
+  why:"Дни отпуска уже оплачены отпускными, поэтому за них не начисляется отдельно аванс или зарплата — иначе была бы двойная оплата."},
+
+ {ch:"Аванс и зарплата", tag:"Даты",
+  theory:["В компании аванс выплачивается 30-го числа, зарплата — 15-го числа следующего месяца.","Это соответствует требованию платить не реже чем раз в полмесяца."],
+  q:"Когда в компании выплачивается аванс?",
+  opts:["25-го числа","30-го числа","В последний рабочий день месяца"], ok:1,
+  calc:"Правило компании · ст. 136 ТК РФ",
+  why:"Аванс — 30-го, зарплата — 15-го числа следующего месяца."},
+
+ {ch:"Аванс и зарплата", tag:"Что входит в аванс",
+  theory:["Аванс — оплата дней, отработанных с 1 по 15 число, без учёта премий.","С аванса удерживается НДФЛ и удержания по исполнительным документам (например, алименты)."],
+  q:"Сотруднику по итогам месяца положена премия. Когда она будет выплачена?",
+  opts:["Частично в авансе, частично в зарплате","В зарплате 15-го числа следующего месяца, аванс премию не включает","Отдельной выплатой в середине месяца"], ok:1,
+  calc:"Правило компании · ст. 226 НК РФ",
+  why:"Аванс — это оплата только отработанных дней без премий. Премия попадает в окончательный расчёт."},
+
+ {ch:"Аванс и зарплата", tag:"Расчёт",
+  theory:["Аванс считается по отработанным дням с 1 по 15 число.","С начисленной суммы сразу удерживается НДФЛ."],
+  q:"Оклад 90 000 ₽, в месяце 22 рабочих дня, с 1 по 15 отработано 11 дней. Сколько придёт на руки в качестве аванса?",
+  opts:["45 000 ₽","39 150 ₽","41 250 ₽"], ok:1,
+  calc:"90 000 ÷ 22 × 11 = 45 000 ₽ начислено; НДФЛ 13% = 5 850 ₽; на руки 45 000 − 5 850 = 39 150 ₽",
+  why:"Не забывайте, что НДФЛ удерживается уже с аванса, а не только со второй части зарплаты."},
+
+ {ch:"Аванс и зарплата", tag:"Болезнь и отпуск",
+  theory:["Аванс начисляется только за фактически отработанные дни.","Больничный и отпускные в первой половине месяца оплачиваются отдельно, по своим правилам."],
+  q:"Сотрудник болел с 1 по 5 число, остальные дни первой половины месяца отработал. Как считается аванс?",
+  opts:["За все 15 дней первой половины месяца, включая больничный","Только за фактически отработанные дни (без учёта больничного)","Аванс в этом случае не выплачивается вовсе"], ok:1,
+  calc:"Аванс = оклад ÷ рабочие дни месяца × фактически отработанные дни",
+  why:"Больничный оплачивается отдельно по своим правилам и не включается в расчёт аванса."},
+
+ {ch:"Аванс и зарплата", tag:"Выходные",
+  theory:["Если день выплаты (аванса или зарплаты) выпадает на выходной или праздник, деньги выплачивают накануне."],
+  q:"15-е число, день выплаты зарплаты, выпало на воскресенье. Когда придут деньги?",
+  opts:["В понедельник, 16-го числа","В пятницу, 13-го числа","Деньги придут точно 15-го, банки работают по выходным"], ok:1,
+  calc:"ст. 136 ТК РФ",
+  why:"Выплата переносится не на более позднюю дату, а на более раннюю — накануне выходного или праздника."},
+
+ {ch:"Аванс и зарплата", tag:"Основание",
+  theory:["Ответ на предыдущий вопрос про даты выплат опирается на два источника: внутреннее правило компании и норму ТК РФ о периодичности выплат."],
+  q:"На что опирается правило «аванс 30-го, зарплата 15-го» в компании?",
+  opts:["Только на внутренний локальный акт компании, ТК РФ дат не регулирует","На внутреннее правило компании, которое соответствует требованию ТК РФ платить не реже раза в полмесяца","Это прямое требование ТК РФ, одинаковое для всех компаний"], ok:1,
+  calc:"Правило компании · ст. 136 ТК РФ",
+  why:"ТК РФ задаёт рамку — не реже чем раз в полмесяца, а конкретные даты устанавливает работодатель локальным актом."}
+];
+
+/* ============ СОСТОЯНИЕ ============ */
+const $ = id => document.getElementById(id);
+let S;
+const fresh = () => ({i:-1, ok:0, streak:0, best:0, res:[], order:[]});
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+let answered = false;
+
+function renderSide(){
+  $('sOk').textContent = S.ok + '/' + CASES.length;
+  $('sStreak').textContent = S.streak;
+  $('sBest').textContent = S.best;
+  let html = '', lastCh = null;
+  CASES.forEach((c,k)=>{
+    if (c.ch !== lastCh){ html += `<div class="grp">${c.ch}</div>`; lastCh = c.ch; }
+    const r = S.res[k]; const cls = k===S.i ? 'cur' : (r===true?'ok':r===false?'bad':'');
+    html += `<li class="${cls}"><i>${r===true?'✓':r===false?'✕':k+1}</i>${c.tag}</li>`;
+  });
+  $('steps').innerHTML = html;
+}
+
+function intro(){
+  S = fresh(); renderSide();
+  $('main').innerHTML = `<div class="fade">
+    <div class="kicker">Программа для сотрудников <em>· ~8 минут</em></div>
+    <h1>Отпуск, аванс, зарплата.<br>Разберитесь, как это устроено именно у нас.</h1>
+    <p class="lead">17 практических вопросов: график отпусков и КЭДО, расчёт отпускных, аванс и зарплата с примерами на реальных цифрах. Каждый ответ разобран с расчётом и ссылкой на норму.</p>
+    <div class="grid3">
+      <div><b>17</b><span>практических вопросов</span></div>
+      <div><b>29,3</b><span>коэффициент для отпускных</span></div>
+      <div><b>30 / 15</b><span>даты аванса и зарплаты</span></div>
+    </div>
+    <button class="btn" onclick="next()">Начать →</button>
+    <p class="note">Материал учебный и не является юридической консультацией. Часть правил — внутренние (график в КЭДО, даты выплат), часть — нормы ТК РФ и НК РФ, актуальные на дату публикации курса.</p>
+  </div>`;
+}
+
+function next(){
+  S.i++; answered = false;
+  if (S.i >= CASES.length) return final();
+  const c = CASES[S.i];
+  S.order = shuffle(c.opts.map((t,k)=>k));
+  renderSide();
+  $('main').innerHTML = `<div class="fade">
+    <div class="bar"><div id="pb"></div></div>
+    <div class="kicker">${c.ch} · ${c.tag} <em>· вопрос ${S.i+1} из ${CASES.length}</em></div>
+    <h1 style="font-size:clamp(20px,2.6vw,28px);margin-bottom:18px">${c.q}</h1>
+    <div class="theory"><ul>${c.theory.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+    <div class="opts" id="opts">${S.order.map((k,n)=>`<button class="opt" data-k="${k}"><kbd>${n+1}</kbd><span>${c.opts[k]}</span></button>`).join('')}</div>
+    <div id="deb"></div>
+  </div>`;
+  requestAnimationFrame(()=>{ $('pb').style.width = (S.i/CASES.length*100)+'%'; });
+  document.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function answer(k){
+  if (answered) return; answered = true;
+  const c = CASES[S.i], good = k===c.ok;
+  S.res[S.i] = good;
+  if (good){ S.ok++; S.streak++; S.best = Math.max(S.best,S.streak);} else S.streak = 0;
+  document.querySelectorAll('.opt').forEach(b=>{
+    const bk=+b.dataset.k; b.disabled = true;
+    if (bk===c.ok) b.classList.add('right');
+    else if (bk===k) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  const last = S.i === CASES.length-1;
+  $('deb').innerHTML = `<div class="debrief ${good?'ok':'bad'}">
+    <div class="head">${good?'Верно':'Неверно — разберём'}</div>
+    <div class="body">
+      <p>${c.why}</p>
+      <div class="calc">${c.calc}</div>
+      <div class="foot">
+        <button class="btn" onclick="next()">${last?'Показать итоги':'Дальше →'}</button>
+      </div>
+    </div></div>`;
+  renderSide();
+  $('deb').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function final(){
+  renderSide();
+  const p = Math.round(S.ok/CASES.length*100);
+  const lvl = p>=90?'Отлично ориентируетесь':p>=70?'Уверенный уровень':p>=50?'Базовый уровень':'Стоит повторить';
+  $('main').innerHTML = `<div class="fade">
+    <div class="bar"><div style="width:100%"></div></div>
+    <div class="kicker">Итоги <em>· ${lvl}</em></div>
+    <div class="big">${S.ok} / ${CASES.length}</div>
+    <p class="lead" style="margin-top:10px">Верных ответов: ${p}%. Лучшая серия подряд — ${S.best}.</p>
+    <div class="recap">${CASES.map((c,k)=>`<div class="${S.res[k]?'y':'n'}"><span>${c.ch} · ${c.tag}</span><span>${S.res[k]?'✓ верно':'✕ повторить'}</span></div>`).join('')}</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn" onclick="intro()">Пройти заново</button>
+      <button class="btn ghost" onclick="window.print()">Сохранить итоги</button>
+    </div>
+    <p class="note">Вопросы по конкретной ситуации — в отдел персонала или бухгалтерию.</p>
+  </div>`;
+}
+
+document.addEventListener('keydown',e=>{
+  if (!S || S.i<0 || S.i>=CASES.length) return;
+  const n = parseInt(e.key,10);
+  if (!answered && n>=1 && n<=S.order.length) answer(S.order[n-1]);
+  else if (answered && (e.key==='Enter'||e.key==='ArrowRight')) next();
+});
+
+intro();
+</script>
+</body>
+</html>
